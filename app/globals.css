@@ -37,6 +37,13 @@
     justify-content: space-between;
     align-items: center;
   }
+  .bg-auth-theme {
+    background-image: url('/images/auth-light.png');
+  }
+
+  :root.dark .bg-auth-theme {
+    background-image: url('/images/auth-dark.png');
+  }
 
   /* Background utilities */
   .background-light850_dark100 {

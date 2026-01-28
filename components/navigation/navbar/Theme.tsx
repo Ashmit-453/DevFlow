@@ -10,11 +10,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useEffect, useState } from "react";
-
+import clsx from "clsx"
 export function ThemeToggle() {
   const { setTheme, theme } = useTheme();
   const [mounted, setMounted] = useState(false);
-
+  const itemClass = (value: string) =>
+    clsx(
+      "cursor-pointer transition-colors",
+      "hover:bg-muted",
+      theme === value && "bg-muted font-medium"
+    )
 
   useEffect(() => {
     setMounted(true);
@@ -33,7 +38,7 @@ export function ThemeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="transition-transform duration-200 hover:scale-110">
+        <Button variant="outline" size="icon" className="transition-transform duration-200 hover:scale-110 cursor-pointer">
           {theme === 'dark' ? (
             <Moon className="size-[1.2rem]" />
           ) : (
@@ -44,13 +49,13 @@ export function ThemeToggle() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
+        <DropdownMenuItem className={itemClass('light')} onClick={() => setTheme("light")}>
           Light
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
+        <DropdownMenuItem className={itemClass('dark')} onClick={() => setTheme("dark")}>
           Dark
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
+        <DropdownMenuItem className={itemClass('system')} onClick={() => setTheme("system")}>
           System
         </DropdownMenuItem>
       </DropdownMenuContent>
