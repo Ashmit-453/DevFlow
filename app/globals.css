@@ -191,6 +191,9 @@
     color: var(--light-800);
   }
 
+  .text-light-500 {
+    color: var(--light-500);
+  }
   .text-light400_light500 {
     color: var(--light-400);
   }
