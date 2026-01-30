@@ -17,7 +17,7 @@ const Navbar =  () => {
             alt='EasyDevFlow Logo'
         />
         <p className='h2-bold font-space-grotesk text-dark-100 dark:text-light-900 max-sm:hidden'>
-            Dev <span style={{ color: 'var(--primary-500)' }}>Flow</span> 
+            Dev<span style={{ color: 'var(--primary-500)' }}>Flow</span> 
         </p> 
         </Link>
 
