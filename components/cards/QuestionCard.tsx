@@ -1,4 +1,5 @@
-import React from 'react'
+'use client'
+import React, {useRef} from 'react'
 import ROUTES from '@/constants/routes';
 import { getTimeStamp } from '@/lib/utils';
 import Link from 'next/link';
@@ -9,7 +10,8 @@ interface Props {
     question: Question;
 }
 const QuestionCard = ({ question : { _id,title,tags,author,upvotes,answers,views,createdAt }, }: Props) => {
-  return (
+
+    return (
     <div className='card-wrapper rounded-[10px] p-9 sm:px-11'>
     <div className='flex flex-col-reverse items-start justify-between gap-5 sm:flex-row'>
         <div>
