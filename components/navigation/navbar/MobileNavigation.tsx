@@ -13,8 +13,12 @@ import {
 } from "@/components/ui/sheet";
 import ROUTES from "@/constants/routes"; 
 import NavLinks from "./NavLinks";
+import { auth, signOut } from "@/auth";
+import { LogOut } from "lucide-react";
 
-const MobileNavigation = () => {
+const MobileNavigation = async () => {
+  const session = await auth();
+  const userId = session?.user?.id;
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -45,6 +49,7 @@ const MobileNavigation = () => {
         </Link>
 
         <div className="no-scrollbar flex h-[calc(100vh-80px)] flex-col justify-between overflow-y-auto">
+          
           <SheetClose asChild>
             <section className="flex h-full flex-col gap-5 pt-16">
               <NavLinks isMobileNav />
@@ -52,7 +57,23 @@ const MobileNavigation = () => {
           </SheetClose>
 
           <div className="flex flex-col gap-3">
-            <SheetClose asChild>
+            {
+      userId ? (
+        <SheetClose asChild>
+          <form action={async () => {
+            "use server";
+            await signOut();
+          }}>
+          <Button type="submit" className="base-medium w-fit !bg-transparent px-4 py-3">
+          <LogOut className="size-5 text-black dark:text-white" />
+          <span className="text-dark300_light900">Logout</span>
+          </Button> 
+          </form>
+        </SheetClose>
+
+      ) : (
+        <>
+        <SheetClose asChild>
               <Link href={ROUTES.SIGN_IN}>
                 <Button className="small-medium btn-secondary h-[10px] w-full rounded-lg px-1 py-5 shadow-none cursor-pointer">
                   <span className="primary-text-gradient">Log In</span>
@@ -67,6 +88,10 @@ const MobileNavigation = () => {
                 </Button>
               </Link>
             </SheetClose>
+             </> 
+
+      )
+    } 
           </div>
         </div>
       </SheetContent>
