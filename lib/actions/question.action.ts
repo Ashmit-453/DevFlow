@@ -1,11 +1,16 @@
 "use server";
+import User from "@/database/user.model"
 import Question,{ IQuestionDoc }from "@/database/question.model";
 import action from "../handlers/action";
-import { AskQuestionSchema,EditQuestionSchema,GetQuestionSchema } from "../validations";
+import { AskQuestionSchema,EditQuestionSchema,GetQuestionSchema,PaginatedSearchParamsSchema } from "../validations";
 import handleError from "../handlers/error";
-import mongoose from 'mongoose';
+import mongoose,{FilterQuery} from 'mongoose';
 import Tag ,{ITagDoc}from "@/database/tag.model";
 import TagQuestion from "@/database/tag-question.model";
+import dbConnect from "@/lib/mongoose";
+void User;
+void Tag;
+void TagQuestion;
 export async function createQuestion(
     params: CreateQuestionParams
 ) : Promise<ActionResponse<Question>> {
@@ -194,6 +199,83 @@ export async function getQuestion(
     } catch (error) {
         return handleError(error) as ErrorResponse;
     } 
+}
+export async function getQuestions(
+    
+    params: PaginatedSearchParams
+): Promise<ActionResponse<{ questions: Question[]; isNext: boolean }>> {
+    await dbConnect();
+    const validationResult = await action({
+        params,
+        schema: PaginatedSearchParamsSchema,
+    });
+
+    if (validationResult instanceof Error) {
+        return handleError(validationResult) as ErrorResponse;
+    }
+
+    const { page = 1, pageSize = 10, query, filter } = params;
+    const skip = (Number(page) - 1) * pageSize;
+    const limit = Number(pageSize);
+
+    const filterQuery: FilterQuery<typeof Question> = {};
+
+    if (filter === "recommended") {
+        return { success: true, data: { questions: [], isNext: false } };
+    }
+
+    if (query) {
+        filterQuery.$or = [
+            { title: { $regex: new RegExp(query, "i") } },
+            { content: { $regex: new RegExp(query, "i") } },
+        ];
+    }
+
+    let sortCriteria = {};
+
+    switch (filter) {
+        case "newest":
+            sortCriteria = { createdAt: -1 };
+            break;
+
+        case "unanswered":
+            filterQuery.answers = 0;
+            sortCriteria = { createdAt: -1 };
+            break;
+
+        case "popular":
+            sortCriteria = { upvotes: -1 };
+            break;
+
+        default:
+            sortCriteria = { createdAt: -1 };
+            break;
+    }
+
+    try {
+        const totalQuestions = await Question.countDocuments(filterQuery);
+
+        const questions = await Question.find(filterQuery)
+            .populate("tags", "name")
+            .populate("author", "name image")
+            .lean()
+            .sort(sortCriteria)
+            .skip(skip)
+            .limit(limit);
+
+        const isNext = totalQuestions > skip + questions.length;
+
+        return {
+            success: true,
+            data: {
+                questions: JSON.parse(JSON.stringify(questions)),
+                isNext,
+            },
+        };
+
+    } catch (error) {
+        return handleError(error) as ErrorResponse;
+    }
 }
 
     
