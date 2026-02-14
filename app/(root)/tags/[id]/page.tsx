@@ -6,6 +6,7 @@ import { EMPTY_QUESTION } from '@/constants/states';
 import { getTagQuestions } from '@/lib/actions/tag.action';
 import React from 'react';
 
+
 const page = async ({ params, searchParams }: RouteParams) => {
     const { id } = await params;
     const { page, pageSize, query } = await searchParams;

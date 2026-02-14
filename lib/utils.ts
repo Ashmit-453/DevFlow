@@ -67,3 +67,12 @@ export const techDescriptionMap: { [key: string]: string } = {
     "PostgreSQL is a robust open-source relational database with advanced features and strong SQL compliance.",
   aws: "AWS is a comprehensive cloud platform offering a wide range of services for deployment, storage, and more.",
 };
+export const formatNumber = (number: number) => {
+  if (number >= 1000000) {
+    return (number / 1000000).toFixed(1) + "M";
+  } else if (number >= 1000) {
+    return (number / 1000).toFixed(1) + "K";
+  } else {
+    return number.toString();
+  }
+};
