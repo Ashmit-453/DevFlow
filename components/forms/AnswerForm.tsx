@@ -22,16 +22,17 @@ import { MDXEditorMethods } from "@mdxeditor/editor";
 import { z } from "zod";
 import TagCard from "../cards/TagCard";
 import { createQuestion, editQuestion } from "@/lib/actions/question.action";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/sonner";
 import { useRouter } from "next/navigation";
 import ROUTES from "@/constants/routes";
+import { createAnswer } from "@/lib/actions/answer.action";
 
 const Editor = dynamic(() => import("@/components/editor"), {
   ssr: false,
 });
 
-const AnswerForm = () => {
-    const [isSubmitting, setIsSubmitting] = useState(false);
+const AnswerForm = ({questionId} : { questionId: string}) => {
+    const [isSubmitting, startAnsweringTransition] = useTransition();
 
     const editorRef = useRef<MDXEditorMethods>(null); 
 
@@ -42,7 +43,24 @@ const AnswerForm = () => {
       },
     });
     const handleSubmit = async (values: z.infer<typeof AnswerSchema>) => {
-        console.log(values)
+       startAnsweringTransition(async () => {
+            const result = await createAnswer({
+                questionId,
+                content: values.content
+            });
+            if (result.success) {
+                form.reset();
+
+            toast.success("Success",{
+                description: "Your answer has been posted scuccessfully"
+            });
+
+            } else {
+                toast.error("error",{
+                    description: result.error?.message
+                });
+            }
+        });        
     }
     return (
 <div>

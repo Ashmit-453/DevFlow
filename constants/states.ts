@@ -44,3 +44,7 @@ export const EMPTY_COLLECTIONS = {
         href: ROUTES.COLLECTION
     },
 };
+export const EMPTY_ANSWERS = {
+    title: "No Answer Found",
+    message: "The Answer could is empty. Add some keyword to make it rain", 
+};
