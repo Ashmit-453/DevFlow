@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{Suspense} from 'react';
 import TagCard from '@/components/cards/TagCard';
 import Metric from '@/components/Metric';
 import UserAvatar from '@/components/UserAvatar';
@@ -11,6 +11,11 @@ import { redirect } from 'next/navigation';
 import AnswerForm from '@/components/forms/AnswerForm';
 import { getAnswers } from '@/lib/actions/answer.action';
 import AllAnswers from '@/components/answers/AllAnswers';
+import Votes from '@/components/votes/Votes';
+import { hasVoted } from '@/lib/actions/vote.action';
+import { hasSavedQuestion } from '@/lib/actions/collection.action';
+import SaveQuestion from '@/components/questions/SaveQuestion';
+
 const QuestionDetails = async ({ params }: RouteParams) => {
     const {id} = await params;
     await incrementViews({ questionId: id });
@@ -26,8 +31,16 @@ const QuestionDetails = async ({ params }: RouteParams) => {
         filter: "latest"
     });
 
-    console.log("Answers", answersResult);
+    const hasVotedPromise = hasVoted({
+        targetId:question._id,
+        targetType: "question"
+    });
+   
+    const { success: hasSaveSuccess, data: hasSaveData} = await hasSavedQuestion({
+        questionId: question._id, 
+    });
 
+    const hasSaved = hasSaveSuccess ? hasSaveData?.saved ?? false : false;
 
     const { author,createdAt,answers,views,tags,content,title } = question;
     return (
@@ -46,8 +59,20 @@ const QuestionDetails = async ({ params }: RouteParams) => {
         </Link> 
            
         </div>
-    <div className='flex justify-end'>
-        <p>Votes</p>
+    <div className='flex justify-end gap-4'>
+        <Suspense>
+         <Votes
+         targetType="question"
+         upvotes={question.upvotes} 
+         downvotes={question.downvotes} 
+         targetId={question._id}
+         hasVotedPromise={hasVotedPromise}
+    />
+        </Suspense>
+     <SaveQuestion
+        questionId = {question._id}
+        hasSaved={hasSaved} 
+    />
     </div> 
       </div>
 
