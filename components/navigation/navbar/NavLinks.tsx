@@ -11,15 +11,17 @@ const NavLinks = ({isMobileNav=false,userId}:{isMobileNav?:boolean, userId?: str
   return (
     <>
     {sidebarLinks.map((item) => {
-            const isActive = (pathname.includes(item.route) && item.route.length > 1) || pathname === item.route;
-            if (item.route === "/profile") {
-                if (userId) item.route = `${item.route}/${userId}`;
-                else return null;  
-            }
+            const href = item.route === "/profile"
+                ? userId ? `/profile/${userId}` : null
+                : item.route;
+
+            if (!href) return null;
+
+            const isActive = (pathname.includes(href) && href.length > 1) || pathname === href;
 
         const LinkComponent = (
             <Link
-              href={item.route}
+              href={href}
               key={item.lable}
               className={cn( isActive
                 ? "primary-gradient rounded-lg text-light-900"

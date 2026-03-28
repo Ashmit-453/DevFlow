@@ -3,11 +3,11 @@ import mongoose from "mongoose";
 import action from "../handlers/action"
 import handleError from "../handlers/error";
 import { CreateVoteSchema, UpdateVoteCountSchema,HasVotedSchema } from "../validations"
-import { Answer, Question,Vote} from "@/database";
+import { Answer, Question, User, Vote} from "@/database";
 import { revalidatePath } from "next/cache";
 import ROUTES from "@/constants/routes";
 
-export async function updateVoteCount( params: UpdateVoteCountParams, session?: ClientSession) : Promise<ActionResponse> {
+export async function updateVoteCount( params: UpdateVoteCountParams, session?: mongoose.ClientSession) : Promise<ActionResponse> {
 
     const validationResult = await action({
         params,
@@ -29,20 +29,40 @@ export async function updateVoteCount( params: UpdateVoteCountParams, session?: 
             { $inc: {[voteField]: change} },
             { new: true, session}
         );
-        await updateVoteCount(
-                { targetId, targetType, voteType:existingVote.voteType, change: -1},
-                session
-            );
 
         if(!result)
-            return handleError( 
+            return handleError(
         new Error("Failed to update vote count")) as ErrorResponse;
 
-        return { success: true }; 
+        return { success: true };
 
     } catch (error) {
         return handleError(error) as ErrorResponse;
-    } 
+    }
+}
+
+async function updateReputation(
+    params: UpdateVoteCountParams,
+    session?: mongoose.ClientSession
+): Promise<ActionResponse> {
+    const { targetId, targetType, voteType, change } = params;
+
+    const REPUTATION_MAP = {
+        question: { upvote: 5,  downvote: -2 },
+        answer:   { upvote: 10, downvote: -2 },
+    } as const;
+
+    const reputationDelta = REPUTATION_MAP[targetType][voteType] * change;
+    const Model = targetType === "question" ? Question : Answer;
+    const contentDoc = await Model.findById(targetId).session(session ?? null);
+    if (!contentDoc) throw new Error(`${targetType} not found`);
+
+    await User.findByIdAndUpdate(
+        contentDoc.author,
+        { $inc: { reputation: reputationDelta } },
+        { new: true, session }
+    );
+    return { success: true };
 }
 
 export async function createVote( params: CreateVoteParams)
@@ -81,7 +101,11 @@ export async function createVote( params: CreateVoteParams)
                 { targetId, targetType, voteType, change: -1},
                 session
             );
-            
+            await updateReputation(
+                { targetId, targetType, voteType, change: -1 },
+                session
+            );
+
         }else {
             /// If the user has already voted with a dfferent voteType, Update the vote
             await Vote.findByIdAndUpdate(
@@ -93,9 +117,17 @@ export async function createVote( params: CreateVoteParams)
                 { targetId, targetType, voteType:existingVote.voteType, change: -1},
                 session
             );
+            await updateReputation(
+                { targetId, targetType, voteType: existingVote.voteType as "upvote" | "downvote", change: -1 },
+                session
+            );
 
             await updateVoteCount(
                 { targetId, targetType, voteType, change: 1},
+                session
+            );
+            await updateReputation(
+                { targetId, targetType, voteType, change: 1 },
                 session
             );
         }
@@ -105,10 +137,14 @@ export async function createVote( params: CreateVoteParams)
             author: userId,
             actionId:targetId ,
             actionType:targetType,
-            voteType 
+            voteType
             }],{session});
         await updateVoteCount(
             {targetId, targetType, voteType, change: 1},
+            session
+        );
+        await updateReputation(
+            { targetId, targetType, voteType, change: 1 },
             session
         );
     }

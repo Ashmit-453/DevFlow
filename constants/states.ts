@@ -50,5 +50,14 @@ export const EMPTY_ANSWERS = {
 };
 export const EMPTY_USERS = {
     title: "No Users Found",
-    message: "You are not along. The only one here. more user are coming soon", 
+    message: "You are not along. The only one here. more user are coming soon",
+};
+
+export const EMPTY_JOBS = {
+    title: "No Jobs Posted Yet",
+    message: "Be the first to post a job and find great talent in the developer community.",
+    button: {
+        text: "Post a Job",
+        href: "/jobs/post",
+    },
 };

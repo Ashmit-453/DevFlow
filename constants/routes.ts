@@ -10,6 +10,9 @@ const ROUTES = {
     COLLECTION: "/collection",
     COMMUNITY: "/community",
     TAGS: "/tags",
+    JOBS: "/jobs",
+    POST_JOB: "/jobs/post",
+    JOB: (id: string) => `/jobs/${id}`,
 }
 export default ROUTES;
 

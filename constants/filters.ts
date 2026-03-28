@@ -31,3 +31,10 @@ export const HomePageFilters = [
     { name: "Oldest", value: "oldest" },
     { name: "Popular", value: "popular" },
   ];
+
+export const JobFilters = [
+    { name: "Full Time", value: "FULLTIME" },
+    { name: "Part Time", value: "PARTTIME" },
+    { name: "Contract", value: "CONTRACTOR" },
+    { name: "Internship", value: "INTERN" },
+  ];

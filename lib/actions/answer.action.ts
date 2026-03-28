@@ -5,7 +5,7 @@ import Answer, { IAnswerDoc } from "@/database/answer.model";
 import action from "../handlers/action";
 import { GetAnswersSchema,AnswerServerSchema } from "../validations";
 import handleError from "../handlers/error";
-import { Question } from "@/database";
+import { Question, User } from "@/database";
 import { revalidatePath } from "next/cache";
 import ROUTES from "@/constants/routes";
 
@@ -46,6 +46,11 @@ export async function createAnswer( params: CreateAnswerParams) : Promise<Action
  
         question.answers += 1;
         await question.save({ session });
+        await User.findByIdAndUpdate(
+            userId,
+            { $inc: { reputation: 1 } },
+            { session }
+        );
         await session.commitTransaction();
 
         revalidatePath(ROUTES.QUESTION(questionId));

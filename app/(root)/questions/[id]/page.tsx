@@ -63,8 +63,8 @@ const QuestionDetails = async ({ params }: RouteParams) => {
         <Suspense>
          <Votes
          targetType="question"
-         upvotes={question.upvotes} 
-         downvotes={question.downvotes} 
+         upvotes={question.upvotes ?? 0}
+         downvotes={question.downvotes ?? 0}
          targetId={question._id}
          hasVotedPromise={hasVotedPromise}
     />
@@ -106,7 +106,7 @@ const QuestionDetails = async ({ params }: RouteParams) => {
     /> 
    </div>
    <br/>
-   <Preview content={content} />
+   <Preview content={content ?? ""} />
 
     <div className='mt-8 flex flex-wrap gap-2'>
         {tags.map((tag: Tag) => (

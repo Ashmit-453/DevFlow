@@ -7,7 +7,7 @@ import { toast } from '@/components/ui/sonner';
 import { signIn } from 'next-auth/react';
 const SocialAuthForm = () => {
     const buttonClass = "background-dark400_light900 body-medium text-dark200_light800 min-h-12 flex-1 rounded-2 px-4 py-3.5";
-    const handleSignIn = async (provider: "github") => {
+    const handleSignIn = async (provider: "github" | "google") => {
         // Call your sign-in logic here, e.g., using NextAuth.js
         try {
             await signIn(provider, {
@@ -38,7 +38,7 @@ const SocialAuthForm = () => {
             <span>Log in with GitHub</span>
             </Button>
 
-            <Button className={`${buttonClass} cursor-pointer`}>
+            <Button className={`${buttonClass} cursor-pointer`} onClick={() => handleSignIn('google')}>
                 <Image
                     src="/icons/google.svg"
                     alt='Google Logo'

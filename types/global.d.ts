@@ -43,6 +43,10 @@ interface RouteParams {
     searchParams: Promise<Record<string, string>>;
 }
 
+interface SearchParams {
+    searchParams: Promise<Record<string, string>>;
+}
+
 interface PaginatedSearchParams {
     page?:number;
     pageSize?: number
@@ -81,4 +85,18 @@ interface BadgeCounts {
     GOLD: number;
     SILVER: number;
     BRONZE:number
+}
+
+interface JobPost {
+    _id: string;
+    title: string;
+    description: string;
+    company: string;
+    location: string;
+    type: "fulltime" | "parttime" | "contract" | "internship";
+    salary?: string;
+    applyLink: string;
+    tags: string[];
+    author: Author;
+    createdAt: Date;
 }

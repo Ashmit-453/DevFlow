@@ -177,3 +177,23 @@ export const GetUserQuestionsSchema = PaginatedSearchParamsSchema.extend({
 export const GetUsersAnswersSchema = PaginatedSearchParamsSchema.extend({
   userId: z.string().min(1, { message: "User ID is required"}),
 });
+
+export const CreateJobSchema = z.object({
+  title: z.string().min(5, { message: "Title must be at least 5 characters." }).max(100),
+  description: z.string().min(20, { message: "Description must be at least 20 characters." }),
+  company: z.string().min(1, { message: "Company name is required." }).max(100),
+  location: z.string().min(1, { message: "Location is required." }).max(100),
+  type: z.enum(["fulltime", "parttime", "contract", "internship"], {
+    message: "Please select a valid job type.",
+  }),
+  salary: z.string().optional(),
+  applyLink: z.string().url({ message: "Please provide a valid URL." }),
+  tags: z
+    .array(z.string().min(1).max(30))
+    .min(1, { message: "At least one tag is required." })
+    .max(5, { message: "Cannot add more than 5 tags." }),
+});
+
+export const GetJobSchema = z.object({
+  jobId: z.string().min(1, { message: "Job ID is required." }),
+});

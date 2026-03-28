@@ -4,7 +4,7 @@ import Question,{ IQuestionDoc }from "@/database/question.model";
 import action from "../handlers/action";
 import { AskQuestionSchema,EditQuestionSchema,GetQuestionSchema,IncrementViewsSchema,PaginatedSearchParamsSchema } from "../validations";
 import handleError from "../handlers/error";
-import mongoose,{FilterQuery} from 'mongoose';
+import mongoose from 'mongoose';
 import Tag ,{ITagDoc}from "@/database/tag.model";
 import TagQuestion from "@/database/tag-question.model";
 import dbConnect from "@/lib/mongoose";
@@ -130,16 +130,18 @@ export async function editQuestion(
                 { $setOnInsert: {name: tag}, $inc: { questions: 1 } },
                 { upsert: true, new: true, session }
             );
-    
+
             if (existingTag) {
                 newTagDcouments.push({
                     tag: existingTag._id,
                     question: questionId
                 });
              question.tags.push(existingTag._id);
-            } 
+            }
         }
-         if (tagsToRemove.length > 0) {
+    }
+
+    if (tagsToRemove.length > 0) {
         const tagIdsToRemove = tagsToRemove.map((tag: ITagDoc) => tag._id);
 
         await Tag.updateMany(
@@ -153,7 +155,7 @@ export async function editQuestion(
             {session}
         );
 
-        question.tags = question.tags.filter(( tag: mongoose.Types.ObjectId) => !tagIdsToRemove.some((id: mongoose.Types.ObjectId) => id.equals(tag._id))); 
+        question.tags = question.tags.filter(( tag: mongoose.Types.ObjectId) => !tagIdsToRemove.some((id: mongoose.Types.ObjectId) => id.equals(tag._id)));
     }
 
     if (newTagDcouments.length > 0) {
@@ -164,7 +166,6 @@ export async function editQuestion(
     await session.commitTransaction();
 
     return { success: true, data: JSON.parse(JSON.stringify(question))};
-    }
 
     } catch (error) {
         await session.abortTransaction();
@@ -220,7 +221,7 @@ export async function getQuestions(
     const skip = (Number(page) - 1) * pageSize;
     const limit = Number(pageSize);
 
-    const filterQuery: FilterQuery<typeof Question> = {};
+    const filterQuery: Record<string, unknown> = {};
 
     if (filter === "recommended") {
         return { success: true, data: { questions: [], isNext: false } };

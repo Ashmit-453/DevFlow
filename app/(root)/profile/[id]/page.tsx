@@ -5,7 +5,6 @@ import UserAvatar from '@/components/UserAvatar';
 import { getUser,getUserQuestions,getUsersAnswers } from '@/lib/actions/user.action';
 import { notFound } from 'next/navigation';
 import dayjs from 'dayjs';
-import { P } from 'pino';
 import Stats from '@/components/user/Stats';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -32,7 +31,7 @@ const Profile = async ({ params,searchParams  }: RouteParams) => {
     </div>
     );
 
-    const {user, totalQuestions,totalAnswers} = data!;
+    const {user, totalQuestions,totalAnswers, badgeCounts} = data!;
     // console.log(user);
      const {
         success: userQuestionsSuccess,
@@ -113,11 +112,8 @@ const Profile = async ({ params,searchParams  }: RouteParams) => {
 <Stats
     totalQuestions={totalQuestions}
     totalAnswers={totalAnswers}
-    badges={{
-        GOLD:0,
-        SILVER:0,
-        BRONZE:0
-    }} 
+    badges={badgeCounts}
+    reputation={user.reputation ?? 0}
 />
 <section className='mt-10 flex gap-10'>
 <Tabs defaultValue="top-posts" className="w-full">

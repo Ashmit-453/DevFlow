@@ -3,9 +3,10 @@ import Image from 'next/image';
 import React from 'react';
 
 interface Props {
-    totalQuestions:number;
+    totalQuestions: number;
     totalAnswers: number;
     badges: BadgeCounts;
+    reputation: number;
 }
 
 interface StatsCardProps{
@@ -27,7 +28,7 @@ const StartsCard = ({imgUrl,value,title }: StatsCardProps) => (
 
 
 
-const Stats = ({ totalQuestions, totalAnswers,badges }: Props) => {
+const Stats = ({ totalQuestions, totalAnswers, badges, reputation }: Props) => {
     return (
 <div className='mt-3'>
     <h4 className='h3-semibold text-dark200_light900'>Stats</h4>
@@ -46,7 +47,14 @@ const Stats = ({ totalQuestions, totalAnswers,badges }: Props) => {
                 {formatNumber(totalAnswers)}
             </p>
             <p className='body-medium text-dark400_light700'>Answers </p>
-        </div> 
+        </div>
+
+        <div>
+            <p className='paragraph-bold text-dark200_light900'>
+                {formatNumber(reputation)}
+            </p>
+            <p className='body-medium text-dark400_light700'>Reputation</p>
+        </div>
     </div>
 
    <StartsCard

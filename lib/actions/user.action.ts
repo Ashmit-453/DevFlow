@@ -1,10 +1,18 @@
 "use server";
 import { Answer, Question, User } from "@/database";
-import { User } from "@/database";
 import action from "../handlers/action";
 import handleError from "../handlers/error";
 import { GetUserSchema,PaginatedSearchParamsSchema } from "../validations";
-import { FilterQuery } from 'mongoose';
+
+const BADGE_THRESHOLDS = { BRONZE: 50, SILVER: 500, GOLD: 5000 } as const;
+
+function getBadgeCounts(reputation: number): BadgeCounts {
+    return {
+        GOLD:   reputation >= BADGE_THRESHOLDS.GOLD   ? 1 : 0,
+        SILVER: reputation >= BADGE_THRESHOLDS.SILVER ? 1 : 0,
+        BRONZE: reputation >= BADGE_THRESHOLDS.BRONZE ? 1 : 0,
+    };
+}
 
 export async function getUsers( params: PaginatedSearchParams) : Promise<ActionResponse< { users: User[]; isNext: boolean }>> {
 
@@ -21,7 +29,7 @@ export async function getUsers( params: PaginatedSearchParams) : Promise<ActionR
     const skip = (Number(page) - 1) * pageSize;
     const limit = Number(pageSize);
 
-    const filterQuery: FilterQuery<typeof User> = {};
+    const filterQuery: Record<string, unknown> = {};
 
     if (query) {
         filterQuery.$or = [
@@ -69,9 +77,10 @@ export async function getUsers( params: PaginatedSearchParams) : Promise<ActionR
 
 }
 export async function getUser(params: GetUserParams): Promise<ActionResponse<{
-    user: typeof User;
+    user: User;
     totalQuestions: number;
-    totalAnswers: number; 
+    totalAnswers: number;
+    badgeCounts: BadgeCounts;
 }>> {
     const validationResult = await action({
         params,
@@ -96,7 +105,8 @@ export async function getUser(params: GetUserParams): Promise<ActionResponse<{
     data: {
         user: JSON.parse(JSON.stringify(user)),
         totalQuestions,
-        totalAnswers
+        totalAnswers,
+        badgeCounts: getBadgeCounts(user.reputation ?? 0),
     },
   };        
     } catch (error) {

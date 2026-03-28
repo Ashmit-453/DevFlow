@@ -1,5 +1,5 @@
 interface SignInWithOAuthParams {
-    provider: "github";
+    provider: "github" | "google";
     providerAccountId: string;
     user: {
         email: string;
@@ -67,4 +67,19 @@ interface GetUserQuestionsParams extends Omit<PaginatedSearchParams, "query" | "
 }
 interface GetUserAnswersParams extends PaginatedSearchParams {
     userId: string;
+}
+
+interface CreateJobParams {
+    title: string;
+    description: string;
+    company: string;
+    location: string;
+    type: "fulltime" | "parttime" | "contract" | "internship";
+    salary?: string;
+    applyLink: string;
+    tags: string[];
+}
+
+interface GetJobParams {
+    jobId: string;
 }
